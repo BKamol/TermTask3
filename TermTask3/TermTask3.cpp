@@ -73,7 +73,8 @@ void string_to_date(string word, date& b_date) //записывает данны
 void text_to_bin() //Создание бинарного файла из структур
 {
     ifstream in("base.txt");
-    ofstream out("base.bin", ios::binary);
+    ofstream out1("base1.bin", ios::binary);
+    ofstream out2("base2.bin", ios::binary);
 
     person pers;
     string word;
@@ -92,24 +93,7 @@ void text_to_bin() //Создание бинарного файла из стр�
         in >> pers.adr.dom;
         in >> pers.adr.kv;
         in >> pers.phone;
-        out.write((char*)&pers, sizeof(pers));
-        show_person(pers);
-    }
-
-    in.close();
-    out.close();
-}
-
-void reading_from_bin()
-{
-    //Формирует два рабочих файла с людьми, у которых образование выше начального, больше одного ребенка.
-    ifstream in("base.bin", ios::binary);
-    ofstream out1("file1.bin", ios::binary);
-    ofstream out2("file2.bin", ios::binary);
-
-    person pers;
-    while (in.read((char*)&pers, sizeof(pers)))
-    {
+        
         if (pers.children >= 1 && pers.education != 'Н')
         {
             if (pers.adr.dom % 2 == 0)
@@ -121,6 +105,8 @@ void reading_from_bin()
                 out2.write((char*)&pers, sizeof(pers)); //Запись во второй рабочий файл
             }
         }
+
+        show_person(pers);
     }
 
     in.close();
@@ -177,39 +163,47 @@ int search_code(string city, string cities[], int city_codes[])
 void printing_results(string cities[], int city_codes[])
 {
     //Фамилия и инициалы, код города, номер дома
-    //Стоит отметить, что Казань и Зеленодольск в файле перепутаны местами
-    ifstream in1("file1.bin", ios::binary);
-    ifstream in2("file2.bin", ios::binary);
+    //Стоит отметить, что Казань и Зеленодольск в файле перепутаны местами, а также Базарные_Матаки и Балтаси.
+    ifstream in1("base1.bin", ios::binary);
+    ifstream in2("base2.bin", ios::binary);
 
     person pers;
     int code;
     string initials;
 
+    cout << "|  " << setw(20) << left << "Фамилия и инициалы" << "| " << "Код города" << " | " << "Номер дома" << " |";
+    cout << "    ";
     cout << "|  " << setw(20) << left << "Фамилия и инициалы" << "| " << "Код города" << " | " << "Номер дома" << " |" << endl;
-    cout << setfill('-') << setw(50) << "" << endl;
+    cout << setfill('-') << setw(50) << "";
+    cout << "    ";
+    cout << setfill('-') << setw(50) << "" << endl;;
     cout << setfill(' ');
 
     while (in1.read((char*)&pers, sizeof(pers)))
     {
         initials = string(pers.f_name) + ' ' + string(pers.s_name)[0] + '.' + string(pers.t_name)[0] + '.';
         code = search_code(pers.adr.city, cities, city_codes);
-        cout << "|  " << setw(20) << left << initials << "|   " << setw(8) << code << " |    " << setw(7) << pers.adr.dom << " |" << endl;
-    }
-    cout << setfill('-') << setw(50) << "" << endl;
-    cout << setfill(' ');
+        cout << "|  " << setw(20) << left << initials << "|   " << setw(8) << code << " |    " << setw(7) << pers.adr.dom << " |";
 
-
-    cout << "|  " << setw(20) << left << "Фамилия и инициалы" << "| " << "Код города" << " | " << "Номер дома" << " |" << endl;
-    cout << setfill('-') << setw(50) << "" << endl;
-    cout << setfill(' ');
-
-    while (in2.read((char*)&pers, sizeof(pers)))
-    {
+        in2.read((char*)&pers, sizeof(pers));
         initials = string(pers.f_name) + ' ' + string(pers.s_name)[0] + '.' + string(pers.t_name)[0] + '.';
         code = search_code(pers.adr.city, cities, city_codes);
+        cout << "    ";
         cout << "|  " << setw(20) << left << initials << "|   " << setw(8) << code << " |    " << setw(7) << pers.adr.dom << " |" << endl;
     }
-    cout << setfill('-') << setw(50) << "" << endl;
+    while (in2.read((char*)&pers, sizeof(pers)))
+    {
+        cout << "|  " << setw(20) << left << " " << "|   " << setw(8) << " " << " |    " << setw(7) << " " << " |";
+
+        initials = string(pers.f_name) + ' ' + string(pers.s_name)[0] + '.' + string(pers.t_name)[0] + '.';
+        code = search_code(pers.adr.city, cities, city_codes);
+        cout << "    ";
+        cout << "|  " << setw(20) << left << initials << "|   " << setw(8) << code << " |    " << setw(7) << pers.adr.dom << " |" << endl;
+    }
+
+    cout << setfill('-') << setw(50) << "";
+    cout << "    ";
+    cout << setfill('-') << setw(50) << "" << endl;;
     cout << setfill(' ');
 
     in1.close();
@@ -223,7 +217,6 @@ int main()
     string_to_date("07101941", d);
     cout << d.day << ' ' << d.month << ' ' << d.year << endl;*/
     //text_to_bin();
-    //reading_from_bin();
 
     string cities[49];
     int city_codes[49];
